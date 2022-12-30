@@ -1,0 +1,60 @@
+DB 종류 
+1. 관계형 (가로세로 엑셀구조 이차원배열)
+ id, 이름 ,수량
+ 0, mouse, 100
+
+ex) MySQL, MariaDB, Oracle
+ SQL 언어를 써서 빠르고 효율적으로 데이터를 입출력 할 수 있다.
+
+2. NoSQL (Object 자료형으로 입출력이 가능)
+ ex) Oracle NoSQL, MongoBD, Redis
+
+
+
+
+
+
+MongoDB atlas 무료로 데이터베이스 사용하기
+Database Access에서 admin 접속용 아이디와 비밀번호를 생성합니다.
+
+ 유저네임 sys0321
+ 패스워드 max0321
+
+Network Access 메뉴에서 IP를 추가합니다.
+
+ 0.0.0.0/0
+ 
+Databass 메뉴에서 cluster에 데이터베이스를 만듭니다.
+ > Browse Collections 찾아서 클릭 
+ > Add My Own Data 클릭
+ > Datanase 이름과 collection 이름 정하기
+ > 연결을 하기 위해서 connect 버튼 찾아서 클릭
+ > Connect you apllication 버튼 찾아서 클릭
+ > 데이터베이스 주소 복사
+
+터미널에서 MongoDB 설치하기
+ $ npm i mongodb@3.6.4
+
+
+const { MongoClient } = require("mongodb");
+const client = new MongoClient(mongoUri, { useUnifiedTopology: true });
+client.connect((에러) => {
+  app.listen(PORT, () => {
+    console.log(`${PORT} 포트 서버 실행.`);
+  });
+});
+
+
+
+
+
+
+연결에 error가 발생할 경우 
+
+
+
+
+
+
+
+

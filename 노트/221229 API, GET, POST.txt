@@ -6,7 +6,7 @@ DELETE 삭제
 
 GET은 쉽게 말해
 /manage 페이지를 GET 요청하면 manage.html 파일을 보내 화면에 그릴 수 있도록 하는 것
-/manage 페이지를 GET 요청한다 => (https//site.com/manage)를 url 주소창에 입력하는 행위
+/manage 페이지를 GET 요청한다 => (https://site.com/manage)를 url 주소창에 입력하는 행위
 
 
 

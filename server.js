@@ -1,11 +1,20 @@
 const express = require("express");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-
 const PORT = 8080;
 
-app.listen(PORT, () => {
-  console.log(`${PORT} 포트 서버 실행.`);
+const mongoUri = `mongodb+srv://sys0321:max0321@cluster0.lncdty3.mongodb.net/todoapp?retryWrites=true&w=majority`;
+const { MongoClient } = require("mongodb");
+const client = new MongoClient(mongoUri, { useUnifiedTopology: true });
+var db;
+
+client.connect((에러) => {
+  if (에러) return console.log(에러);
+  db = client.db("todoapp");
+
+  app.listen(8080, function () {
+    console.log("listening on 8080");
+  });
 });
 
 app.get("/beauty", (요청, 응답) => {

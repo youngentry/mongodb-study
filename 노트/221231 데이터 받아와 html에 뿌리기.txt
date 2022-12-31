@@ -1,0 +1,50 @@
+cluster0에 들어가 보면 collections가 있습니다.
+
+Database가 일종의 폴더라면
+collection은 엑셀 파일입니다.
+
+
+
+
+
+데이터베이스에 자료 추가하기
+client.connect((에러) => {
+  db.collection("post").insertOne({ name: "You", nationality: "KOR" }, (에러, 결과) => {
+    console.log("저장완료");
+  });
+});
+ => post collection에 { name: "You", nationality: "KOR" } 데이터를 추가합니다.
+
+schema라 하여 데이터의 타입을 정해주지 않아도 MongoDB에서 자동으로 지정해줍니다
+ => name:"You" String
+
+
+post 요청을 통해서 유저가 입력한 정보를 데이터베이스에 저장하려면 이렇게
+app.post("/add", (요청, 응답) => {
+  응답.send(`/add로 POST 전송 성공했다. 요청.body.title = ${요청.body.title}`);
+  db.collection("post").insertOne({ _id: 1, 제목: 요청.body.title, 날짜: 요청.body.date }, (에러, 결과) => {
+    console.log("저장완료");
+  });
+});
+
+
+
+
+
+
+
+EJS로 데이터베이스에서 받아온 자료 넣어주려면 render
+app.get("/list", (요청, 응답) => {
+  // 모든 데이터 가져오기
+  db.collection("post").find().toArray((에러, 결과) => {
+// list.ejs를 render 할 때, 결과를 전달하기
+      응답.render("list.ejs", { posts: 결과 });
+    });
+});
+
+
+EJS 문법 써서 반복문으로 짜는 법 
+    <% for (let i = 0; i< posts.length; i++) { %>
+      <h3>할일 : <%= posts[i].제목 %></h3>
+      <p>날짜 : <%= posts[i].날짜 %></p>
+    <% } %>

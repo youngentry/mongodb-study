@@ -126,3 +126,14 @@ app.get("/detail/:id", (요청, 응답) => {
     // => 그걸 data라는 변수명에 담아서 ejs 파일로 보내주고 렌더링할 준비 해줘
   });
 });
+
+// 230104 06:30 PUT요청 해보자
+app.put("/edit", (요청, 응답) => {
+  // query 문으로 "찾을데이터를", "이럴게바꿔주세요", callback해주세요.
+  // $set 연산자는 없으면 추가하고, 있다면 업데이트 합니다.
+  // => { _id: 13 } 인 데이터 찾아서, 이 데이터의 {제목:수정전} 을 {제목:수정후} 로 바꿔주세요.
+  db.collection("post").updateOne({ _id: parseInt(요청.body.id) }, { $set: { 제목: 요청.body.title, 날짜: 요청.body.title } }, (에러, 결과) => {
+    // redirect로 특정 페이지로 보냅니다.
+    응답.redirect("/list");
+  });
+});

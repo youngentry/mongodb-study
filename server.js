@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-app.set("view engine", "ejs");
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
 
+app.set("view engine", "ejs");
 app.use("/public", express.static("public"));
 
 const PORT = 8080;
@@ -16,7 +18,7 @@ client.connect((에러) => {
   if (에러) return console.log(에러);
   db = client.db("todoapp");
 
-  app.listen(8080, function () {
+  app.listen(PORT, function () {
     console.log("8080 포트 tooapp Database에 연결 되었음");
   });
 });
@@ -72,5 +74,22 @@ app.get("/detail/:id", (요청, 응답) => {
       return 응답.render("detail.ejs", { data: 결과 });
     }
     응답.render("detail404.ejs");
+  });
+});
+
+app.get("/edit/:id", (요청, 응답) => {
+  db.collection("post").findOne({ _id: parseInt(요청.params.id) }, (에러, 결과) => {
+    if (결과) {
+      console.log(결과);
+      return 응답.render("edit.ejs", { post: 결과 });
+    }
+    응답.render("detail404.ejs");
+  });
+});
+
+app.put("/edit", (요청, 응답) => {
+  db.collection("post").updateOne({ _id: parseInt(요청.body.id) }, { $set: { 제목: 요청.body.title, 날짜: 요청.body.date } }, (에러, 결과) => {
+    console.log("수정 성공");
+    응답.redirect("/list");
   });
 });

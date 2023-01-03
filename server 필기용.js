@@ -94,3 +94,35 @@ app.get("/list", (요청, 응답) => {
       응답.render("list.ejs", { posts: 결과 });
     });
 });
+
+// 230101 16:49 받아온 데이터를 삭제합니다.
+app.delete("/delete", (요청, 응답) => {
+  console.log(요청.body); // { _id: '1' } jquery로 보낸 데이터
+  요청.body._id = parseInt(요청.body._id); // 데이터가 int 1이 아닌 string "1" 이 넘어왔기 때문에 변환을 해준다.
+  db.collection("post").deleteOne(요청.body, (에러, 결과) => {
+    console.log("삭제했습니다.");
+  });
+});
+
+// 230101 18:50 응답방법
+app.delete("/delete", (요청, 응답) => {
+  요청.body._id = parseInt(요청.body._id);
+  db.collection("post").deleteOne(요청.body, (에러, 결과) => {
+    응답.status(200).send({ message: "삭제성공." });
+    // 서버는 응답을 해주어야 한다.
+    // 200 성공
+    // 400 고객 요청 문제
+    // 500 서버 문제
+  });
+});
+
+// 230103 19:30 params를 이용하여 상세페이지 만들기
+// '/detail/:아무문자열' 로 접속을 하면 callback 실행해주세요~
+app.get("/detail/:id", (요청, 응답) => {
+  // 문자열을 받아오기 때문에 parseInt로 int 형으로 바꿔준다.
+  db.collection("post").findOne({ _id: parseInt(요청.params.id) }, (에러, 결과) => {
+    // id 중에서 유저가 url 창에 입력한 "문자열" (ex) detail/13) 13을 DB에서 찾는다.
+    응답.render("detail.ejs", { data: 결과 });
+    // => 그걸 data라는 변수명에 담아서 ejs 파일로 보내주고 렌더링할 준비 해줘
+  });
+});

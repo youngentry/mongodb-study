@@ -23,6 +23,8 @@ id를 저장할 collection를 별도로 만듭니다.
 
 
 
+
+
 id를 저장한 데이터를 불러옵니다.
     db.collection("counter").findOne({ name: "게시물수" }, (에러, 결과) => {
       const 총게시물갯수 = 결과.totalPost;
@@ -38,3 +40,13 @@ id를 저장한 데이터를 불러옵니다.
         $set 연산자: 바꿔주세요. $inc: 증가시켜주세요
         db.collection("counter").updateOne({ 수정할데이터 }, { $inc: { 수정값 } }, (에러, 결과) => {
           if (에러) return console.log(에러);
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          

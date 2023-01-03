@@ -52,3 +52,23 @@ app.get("/list", (요청, 응답) => {
       응답.render("list.ejs", { posts: 결과 });
     });
 });
+
+app.delete("/delete", (요청, 응답) => {
+  요청.body._id = parseInt(요청.body._id);
+  db.collection("post").deleteOne(요청.body, (에러, 결과) => {
+    응답.status(200).send({ message: "성공했습니다." });
+    // 서버는 응답을 해주어야 한다.
+    // 200 성공
+    // 400 고객 요청 문제
+    // 500 서버 문제
+  });
+});
+
+app.get("/detail/:id", (요청, 응답) => {
+  db.collection("post").findOne({ _id: parseInt(요청.params.id) }, (에러, 결과) => {
+    if (결과) {
+      return 응답.render("detail.ejs", { data: 결과 });
+    }
+    응답.render("detail404.ejs");
+  });
+});

@@ -1,0 +1,18 @@
+css파일 넣기
+
+public 폴더에 css 파일을 저장하는 이유는?
+    <link rel="stylesheet" href="/public/main.sass" />
+변하지 않는 파일(static files)은 보통 public 폴더 안에 저장한다.
+
+server.js에도 middleware를 아래와 같이 추가해주어야 합니다.
+app.use("/public", express.static("public"));
+=> static파일은 public폴더에 보관할게요.
+
+
+
+
+부트스트랩 클래스
+container: 컨테이너처럼 좌우 마진 고정, width 화면너비에 따라 변함
+mt-3: margin-top 같은거
+btn btn-danger: 버튼 꾸미기
+text-center: text 옵션 같은거

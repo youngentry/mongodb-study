@@ -3,6 +3,8 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
+app.use("/public", express.static("public"));
+
 const PORT = 8080;
 const mongoUri = `mongodb+srv://sys0321:max0321@cluster0.lncdty3.mongodb.net/todoapp?retryWrites=true&w=majority`;
 
@@ -38,11 +40,11 @@ app.get("/beauty", (요청, 응답) => {
 });
 
 app.get("/", (요청, 응답) => {
-  응답.sendFile(__dirname + "/index.html");
+  응답.render("index.ejs");
 });
 
 app.get("/write", (요청, 응답) => {
-  응답.sendFile(__dirname + "/write.html");
+  응답.render("write.ejs");
 });
 
 app.get("/list", (요청, 응답) => {

@@ -1,18 +1,162 @@
-css파일 넣기
-
-public 폴더에 css 파일을 저장하는 이유는?
-    <link rel="stylesheet" href="/public/main.sass" />
-변하지 않는 파일(static files)은 보통 public 폴더 안에 저장한다.
-
-server.js에도 middleware를 아래와 같이 추가해주어야 합니다.
-app.use("/public", express.static("public"));
-=> static파일은 public폴더에 보관할게요.
+jquery로 AJAX 요청하기
+JQuery slim 버전은 AJAX 요청을 할 수 없으니 slim은 지워줍니다.
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+ 
 
 
+아래와 같이 작성해 server.js에 삭제할 데이터를 넘겨줍니다.
+    <script>
+      $.ajax({
+        method: "DELETE",
+        // => 서버 새로고침 없이 DELETE 요청 합니다.
 
+        url: "/delete",
+        // => /delete 경로에 있는
+ 
+        data: "삭제할데이터",
+        // => "삭제할데이터"를 다룰 거에요
+ 
+      }).done(() => {
+        // => 요청이 되었으면 실행해주세요
+      });
+    </script>
+ 
+    <script>
+      $.ajax({
+        method: "DELETE",
+        url: "/delete",
+        data: { _id:1 },
+      }).done(() => {
+        // => 요청이 되었으면 실행해주세요
+      });
+받아온 데이터를 삭제합니다.
+app.delete("/delete", (요청, 응답) => {
+  console.log(요청.body);
+=> { _id: '1' } jquery로 보내온 데이터
+ 
+  요청.body._id = parseInt(요청.body._id);
+=> 데이터가 int 1이 아닌 string "1" 이 넘어왔기 때문에 변환을 해준다.
+ 
+  db.collection("post").deleteOne(요청.body, (에러, 결과) => {
+    console.log("삭제했습니다.");
+=> 삭제한 뒤 실행할 코드
+  });
+});
+app.delete("/delete", (요청, 응답) => {
+  요청.body._id = parseInt(요청.body._id);
+  db.collection("post").deleteOne(요청.body, (에러, 결과) => {
+    console.log("삭제했습니다.");
+  });
+});
+원하는 게시물을 선택해 삭제하기
+지금은 "새로고침"을 할 때 { _id:1 } 데이터를 삭제하고 있습니다.
 
-부트스트랩 클래스
-container: 컨테이너처럼 좌우 마진 고정, width 화면너비에 따라 변함
-mt-3: margin-top 같은거
-btn btn-danger: 버튼 꾸미기
-text-center: text 옵션 같은거
+    <script>
+      $.ajax({
+        method: "DELETE",
+        url: "/delete",
+        data: { _id:1 },
+      }).done(() => {
+        // => 요청이 되었으면 실행해주세요
+      });
+ 
+
+ 
+ 
+게시물을 선택하기 위해 버튼에 delete 클래스를 주고,
+        <button class="delete">삭제</button>
+ 
+
+ 
+선택된 삭제 버튼에 id를 주어 특정 버튼을 누르면 그에 맞는 id를 가진 게시물을 삭제하도록 합니다.
+      <% for (var i = 0; i < posts.length; i++){ %>
+      <li class="list-group-item">
+        <p>글번호 : <%= posts[i]._id %></p>
+        <h4>할일 제목 : <%= posts[i].제목 %></h4>
+        <p>할일 마감날짜 : <%= posts[i].날짜 %></p>
+        <button class="delete" data-id="<%= posts[i]._id %>">>삭제</button>
+      </li>
+      <% } %>
+ 
+
+ 
+쿼리 선택자로 .delete class를 가진 요소를 다룹니다.
+      $(".delete").click(() => {
+         // => 실행할 코드
+      });
+ 
+ 
+
+data-id의 값을 가져옵니다.
+      $(".delete").click((e) => {
+        const 글번호 = e.target.dataset.id;
+           => data-id 의 값을 가져와주세요.
+
+        $.ajax({
+          method: "DELETE",
+          url: "/delete",
+          data: { _id: 글번호 },
+        }).done(() => {
+        });
+      });
+삭제 버튼을 누르면 데이터베이스에서 삭제가 잘 됩니다.
+
+ 
+
+ 
+
+ 
+
+ 
+
+삭제한 데이터가 브라우저 화면에 남아있지 않도록 사라지게 합니다.
+      $(".delete").click((e) => {
+        const 글번호 = e.target.dataset.id;
+        const 이벤트가동작하는태그 = $(this)
+// => (여기서는) button 태그 선택해주세요
+
+        $.ajax({
+          method: "DELETE",
+          url: "/delete",
+          data: { _id: 글번호 },
+        })
+          .done(() => {
+            이벤트가동작하는태그.parent('li').fadeOut()
+// => (여기서는) button 태그의 부모 중 'li' 선택해서, fadeOut 시켜주세요.
+          })
+        const 글번호 = e.target.dataset.id;
+        const 이벤트가동작하는태그 = $(this);
+
+        $.ajax({ method: "DELETE", url: "/delete", data: { _id: 글번호 } })
+          .done(() => {
+            이벤트가동작하는태그.parent("li").fadeOut();
+          })
+ 
+
+ 
+
+ 
+
+삭제요청의 성공/실패를 확인해봅시다.
+서버는 응답을 해주어야 합니다.
+app.delete("/delete", (요청, 응답) => {
+  요청.body._id = parseInt(요청.body._id);
+  db.collection("post").deleteOne(요청.body, (에러, 결과) => {
+    응답.status(200).send({ message: "성공했습니다." });
+  });
+});
+    // 200 성공
+    // 400 고객 요청 문제
+    // 500 서버 문제
+솔직히 여기서 state(200) 뒤에 .send() 왜 하는지 모르겠음.
+ 
+성공했을 경우에 실행할 코드는 done(), 실패했을 경우 실행할 코드는 fail()
+        $.ajax({ method: "DELETE", url: "/delete", data: { _id: 글번호 } })
+          .done(() => {
+            console.log(`${글번호} 삭제성공`);
+            이벤트가동작하는태그.parent("li").fadeOut();
+          })
+          .fail((xhr, textStatus, errorThrown) => {
+            console.log(xhr, textStatus, errorThrown);
+            console.log(`${글번호} 삭제실패`);
+          });

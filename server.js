@@ -1,8 +1,15 @@
 const express = require("express");
 const app = express();
+const methodOverride = require("method-override"); // html5 PUT기능
+const passport = require("passport"); // 세션 로그인
+const LocalStrategy = require("passport-local").Strategy; // 세션 로그인
+const session = require("express-session"); // 세션 로그인
+
 app.use(express.urlencoded({ extended: true }));
-const methodOverride = require("method-override");
-app.use(methodOverride("_method"));
+app.use(methodOverride("_method")); // html5 PUT기능
+app.use(session({ secret: "비밀코드", resave: true, saveUninitialized: false })); // 세션 로그인
+app.use(passport.initialize()); // 세션 로그인
+app.use(passport.session()); // 세션 로그인
 
 app.set("view engine", "ejs");
 app.use("/public", express.static("public"));
@@ -92,4 +99,58 @@ app.put("/edit", (요청, 응답) => {
     console.log("수정 성공");
     응답.redirect("/list");
   });
+});
+
+app.get("/login", (요청, 응답) => {
+  응답.render("login.ejs");
+});
+
+// local 방식으로 id/password 인증한다.
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/fail",
+  }),
+  (요청, 응답) => {
+    응답.redirect("/");
+  }
+);
+
+passport.use(
+  new LocalStrategy(
+    {
+      // 유저가 form에 입력한 name 속성을 넣어주기
+      usernameField: "id",
+      passwordField: "password",
+      // 로그인 후 세션 저장여부
+      session: true,
+      // id, password 이외에 검증할 정보를 callback의 req에 담을지 여부
+      passReqToCallback: false,
+    },
+    // id, password 검증 과정. 서버에러있니, id/password일치하는지 검증
+    function (입력한아이디, 입력한비번, done) {
+      console.log(입력한아이디, 입력한비번);
+      db.collection("login").findOne({ id: 입력한아이디 }, function (에러, 결과) {
+        // done(서버에러, 성공 시 유저DB데이터/실패 시 false넣기, 출력할 에러메시지)
+        if (에러) return done(에러);
+
+        if (!결과) return done(null, false, { message: "존재하지않는 아이디요" });
+        if (입력한비번 == 결과.password) {
+          return done(null, 결과);
+        } else {
+          return done(null, false, { message: "비번틀렸어요" });
+        }
+      });
+    }
+  )
+);
+
+// id를 이용해 세션을 만들고 쿠키로 보냄
+// done의 결과가 user로 들어간다.
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (아이디, done) {
+  done(null, {});
 });

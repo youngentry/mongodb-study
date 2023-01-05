@@ -24,12 +24,12 @@
     <div class="container">
     <!-- JS 문법 써서 반복문으로 짜는 법 -->
     <ul class="list-group">
-      <% for (var i = 0; i < posts.length; i++){ %>
+      <% for (var i = 0; i < searchResult.length; i++){ %>
       <li class="list-group-item">
-        <p href="<%= `detail/${posts[i]._id}` %>">글번호 : <%= posts[i]._id %></p>
-        <h4><a href=<%= `detail/${posts[i]._id}` %>>할일 제목 : <%= posts[i].제목 %></a></h4>
-        <p>할일 마감날짜 : <%= posts[i].날짜 %></p>
-        <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
+        <p href="<%= `detail/${searchResult[i]._id}` %>">글번호 : <%= searchResult[i]._id %></p>
+        <h4><a href=<%= `detail/${searchResult[i]._id}` %>>할일 제목 : <%= searchResult[i].제목 %></a></h4>
+        <p>할일 마감날짜 : <%= searchResult[i].날짜 %></p>
+        <button class="btn btn-danger delete" data-id="<%= searchResult[i]._id %>">삭제</button>
       </li>
       <% } %>
     </ul>
@@ -61,11 +61,6 @@
         const searchInput = $('#search-input').val()
         // GET요청과 동일하게 동작하여 URL을 바꿀 수 있다.
         window.location.replace("/search?value=" + searchInput)
-
-        // 쿼리 형태를 직접 입력하지 않고, Object 타입의 자료를 Query String 형태로 변환하려면
-        // $.param(자료) // {name:"value", name2:"value2"}
-        // 폼 태그로 전송한 데이터 전부를 Query String 형태로 만들려면
-        // $(폼태그).serialize()
       })
     </script>
 

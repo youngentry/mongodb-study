@@ -1,0 +1,18 @@
+1. 환경변수 이용 위한 라이브러리 설치
+
+$ npm i dotenv
+
+2. server.js 에서 환변경수 모듈 불러오기
+
+require('dotenv').config()
+
+3.server.js와 같은 경로에 .env 파일 만들기
+
+PORT=8080
+DB_URL="mongodb+srv://...";
+
+이런식으로 환경변수를 만듭니다.
+
+4. 환경변수를 server.js에서 불러옵니다.
+process.env.변수이름 
+이렇게 불러오면 됩니다.

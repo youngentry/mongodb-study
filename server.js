@@ -176,3 +176,28 @@ passport.deserializeUser(function (아이디, done) {
     done(null, 결과);
   });
 });
+
+// 검색기능 구현하기
+app.get("/search", (요청, 응답) => {
+  const 검색조건 = [
+    {
+      $search: {
+        index: "titleSearch",
+        text: {
+          query: 요청.query.value,
+          path: "제목", // 여러가지 조건을 찾고 싶으면 ['제목', '날짜']
+        },
+      },
+    },
+    // 정렬기능
+    { $sort: { _id: 1 } },
+    // 표시할 최대 갯수
+    { $limit: 5 },
+  ];
+  console.log(요청.query);
+  db.collection("post")
+    .aggregate(검색조건)
+    .toArray((에러, 결과) => {
+      응답.render("searchList.ejs", { searchResult: 결과 });
+    });
+});

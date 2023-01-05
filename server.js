@@ -4,6 +4,7 @@ const methodOverride = require("method-override"); // html5 PUT기능
 const passport = require("passport"); // 세션 로그인
 const LocalStrategy = require("passport-local").Strategy; // 세션 로그인
 const session = require("express-session"); // 세션 로그인
+require("dotenv").config();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method")); // html5 PUT기능
@@ -14,11 +15,12 @@ app.use(passport.session()); // 세션 로그인
 app.set("view engine", "ejs");
 app.use("/public", express.static("public"));
 
-const PORT = 8080;
-const mongoUri = `mongodb+srv://sys0321:max0321@cluster0.lncdty3.mongodb.net/todoapp?retryWrites=true&w=majority`;
+const PORT = process.env.PORT;
+const DB_URL = process.env.DB_URL;
 
 const { MongoClient } = require("mongodb");
-const client = new MongoClient(mongoUri, { useUnifiedTopology: true });
+const e = require("express");
+const client = new MongoClient(DB_URL, { useUnifiedTopology: true });
 var db;
 
 client.connect((에러) => {
@@ -116,6 +118,22 @@ app.post(
   }
 );
 
+// middleware 만들기
+const isLogin = (요청, 응답, next) => {
+  console.log(요청.user);
+  if (요청.user) {
+    next();
+  } else {
+    응답.send("로그인 안했어요.");
+  }
+};
+
+// 두번째 인자로는 middleware를 넣으면 된다. => isLogin
+app.get("/mypage", isLogin, (요청, 응답) => {
+  console.log(요청.user);
+  응답.render("mypage.ejs", { user: 요청.user });
+});
+
 passport.use(
   new LocalStrategy(
     {
@@ -151,6 +169,10 @@ passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
+// DB에서 user.id로 유저를 찾고, 유저 정보를 반환한다.
+// 바로 위의 serializeUser 메서드에서 user.id가 deserializeUser의 첫번째 인자로 들어오게 된다.
 passport.deserializeUser(function (아이디, done) {
-  done(null, {});
+  db.collection("login").findOne({ id: 아이디 }, (에러, 결과) => {
+    done(null, 결과);
+  });
 });

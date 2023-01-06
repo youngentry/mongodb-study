@@ -18,11 +18,11 @@
       <form action="/login" method="POST">
         <div class="form-group">
           <label>로그인 ID</label>
-          <input type="text" class="form-control" name="id" />
+          <input type="text" class="form-control" name="id" pattern="^[a-zA-Z0-9]{4,20}$" required maxlength="20" />
         </div>
         <div class="form-group mb-2">
           <label>로그인 Password</label>
-          <input type="text" class="form-control" name="password" />
+          <input type="text" class="form-control" name="password" pattern="^[a-zA-Z0-9]{4,20}$" required maxlength="20" />
         </div>
         <button type="submit" class="btn btn-outline-secondary">로그인</button>
       </form>
@@ -32,11 +32,11 @@
       <form action="/register" method="POST">
         <div class="form-group">
           <label>회원가입 ID</label>
-          <input type="text" class="form-control" name="id" />
+          <input type="text" class="form-control" name="id" pattern="^[a-zA-Z0-9]{4,20}$" required maxlength="20" />
         </div>
         <div class="form-group mb-2">
           <label>회원가입 Password</label>
-          <input type="text" class="form-control" name="password" />
+          <input type="text" class="form-control" name="password" pattern="^[a-zA-Z0-9]{4,20}$" required maxlength="20" />
         </div>
         <button type="submit" class="btn btn-outline-secondary">가입</button>
       </form>

@@ -238,7 +238,13 @@ app.post("/register", (요청, 응답) => {
   // id가 이미 있는지 확인
   // id에 앞파벳 숫자만 들어있는지
   // 비밀번호 저장 전에 암호화
-  db.collection("login").insertOne({ id: 요청.body.id, pw: 요청.body.password }, (에러, 결과) => {
-    응답.redirect("/");
+  db.collection("login").findOne({ id: 요청.body.id }, (에러, 결과) => {
+    if (결과) {
+      응답.redirect("/login");
+    } else {
+      db.collection("login").insertOne({ id: 요청.body.id, pw: 요청.body.password }, (에러, 결과) => {
+        응답.redirect("/");
+      });
+    }
   });
 });

@@ -163,15 +163,29 @@ app.get("/search", (요청, 응답) => {
 });
 
 app.post("/register", (요청, 응답) => {
+  // 아이디 유효성 검사
+  const checkId = /^[a-zA-Z0-9]{4,20}$/;
+  if (!checkId.test(요청.body.id)) {
+    console.log("아디 4~20 자리의 영문자또는 숫자");
+    return 응답.redirect("/login");
+  }
+
+  // 비밀번호 유효성 검사
+  const checkPassword = /^[a-zA-Z0-9]{4,20}$/;
+  if (!checkPassword.test(요청.body.password)) {
+    console.log("비번 4~20 자리의 영문자또는 숫자");
+    return 응답.redirect("/login");
+  }
+
   // 아이디 중복체크
   db.collection("login").findOne({ id: 요청.body.id }, (에러, 결과) => {
     if (결과) {
-      응답.redirect("/login");
-    } else {
-      db.collection("login").insertOne({ id: 요청.body.id, pw: 요청.body.password }, (에러, 결과) => {
-        응답.redirect("/");
-      });
+      console.log("아디 중복임");
+      return 응답.redirect("/login");
     }
+    db.collection("login").insertOne({ id: 요청.body.id, pw: 요청.body.password }, (에러, 결과) => {
+      return 응답.redirect("/");
+    });
   });
 });
 

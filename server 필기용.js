@@ -137,3 +137,108 @@ app.put("/edit", (요청, 응답) => {
     응답.redirect("/list");
   });
 });
+
+// local 방식으로 id/password 인증한다.
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/fail",
+  }),
+  (요청, 응답) => {
+    응답.redirect("/");
+  }
+);
+
+// middleware 만들기
+const isLogin = (요청, 응답, next) => {
+  console.log(요청.user);
+  if (요청.user) {
+    next();
+  } else {
+    응답.send("로그인 안했어요.");
+  }
+};
+
+// 두번째 인자로는 middleware를 넣으면 된다. => isLogin
+app.get("/mypage", isLogin, (요청, 응답) => {
+  console.log(요청.user);
+  응답.render("mypage.ejs", { user: 요청.user });
+});
+
+passport.use(
+  new LocalStrategy(
+    {
+      // 유저가 form에 입력한 name 속성을 넣어주기
+      usernameField: "id",
+      passwordField: "password",
+      // 로그인 후 세션 저장여부
+      session: true,
+      // id, password 이외에 검증할 정보를 callback의 req에 담을지 여부
+      passReqToCallback: false,
+    },
+    // id, password 검증 과정. 서버에러있니, id/password일치하는지 검증
+    function (입력한아이디, 입력한비번, done) {
+      console.log(입력한아이디, 입력한비번);
+      db.collection("login").findOne({ id: 입력한아이디 }, function (에러, 결과) {
+        // done(서버에러, 성공 시 유저DB데이터/실패 시 false넣기, 출력할 에러메시지)
+        if (에러) return done(에러);
+
+        if (!결과) return done(null, false, { message: "존재하지않는 아이디요" });
+        if (입력한비번 == 결과.password) {
+          return done(null, 결과);
+        } else {
+          return done(null, false, { message: "비번틀렸어요" });
+        }
+      });
+    }
+  )
+);
+
+// id를 이용해 세션을 만들고 쿠키로 보냄
+// done의 결과가 user로 들어간다.
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+// DB에서 user.id로 유저를 찾고, 유저 정보를 반환한다.
+// 바로 위의 serializeUser 메서드에서 user.id가 deserializeUser의 첫번째 인자로 들어오게 된다.
+passport.deserializeUser(function (아이디, done) {
+  db.collection("login").findOne({ id: 아이디 }, (에러, 결과) => {
+    done(null, 결과);
+  });
+});
+
+// 검색기능 구현하기
+app.get("/search", (요청, 응답) => {
+  const 검색조건 = [
+    {
+      $search: {
+        index: "titleSearch",
+        text: {
+          query: 요청.query.value,
+          path: "제목", // 여러가지 조건을 찾고 싶으면 ['제목', '날짜']
+        },
+      },
+    },
+    // 정렬기능
+    { $sort: { _id: 1 } },
+    // 표시할 최대 갯수
+    { $limit: 5 },
+  ];
+  console.log(요청.query);
+  db.collection("post")
+    .aggregate(검색조건)
+    .toArray((에러, 결과) => {
+      응답.render("searchList.ejs", { searchResult: 결과 });
+    });
+});
+
+// 230106 21:00 회원가입 기능은 passport 아래에 위치
+app.post("/register", (요청, 응답) => {
+  // id가 이미 있는지 확인
+  // id에 앞파벳 숫자만 들어있는지
+  // 비밀번호 저장 전에 암호화
+  db.collection("login").insertOne({ id: 요청.body.id, pw: 요청.body.password }, (에러, 결과) => {
+    응답.redirect("/");
+  });
+});

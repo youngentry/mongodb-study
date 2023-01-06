@@ -17,14 +17,28 @@
     <div class="container mt-3">
       <form action="/login" method="POST">
         <div class="form-group">
-          <label>ID</label>
+          <label>로그인 ID</label>
           <input type="text" class="form-control" name="id" />
         </div>
-        <div class="form-group">
-          <label>Password</label>
+        <div class="form-group mb-2">
+          <label>로그인 Password</label>
           <input type="text" class="form-control" name="password" />
         </div>
-        <button type="submit" class="btn btn-outline-secondary">Submit</button>
+        <button type="submit" class="btn btn-outline-secondary">로그인</button>
+      </form>
+    </div>
+
+    <div class="container mt-3">
+      <form action="/register" method="POST">
+        <div class="form-group">
+          <label>회원가입 ID</label>
+          <input type="text" class="form-control" name="id" />
+        </div>
+        <div class="form-group mb-2">
+          <label>회원가입 Password</label>
+          <input type="text" class="form-control" name="password" />
+        </div>
+        <button type="submit" class="btn btn-outline-secondary">가입</button>
       </form>
     </div>
     <!-- 부트스트랩 스크립트 -->

@@ -248,3 +248,69 @@ app.post("/register", (요청, 응답) => {
     }
   });
 });
+
+// router 가져다 쓰는 방법 use middleware를 이용합니다.
+// '/shop'경로로 접속하면 router middleware를 실행합니다.
+app.use("/shop", require("./routes/shop.js"));
+app.use("/board/sub", require("./routes/board.js"));
+
+// npm i multer 파일 전송을 도와주는 라이브러리 설치
+const multer = require("multer");
+
+// 이미지 메모리에 저장하기 (휘발성)
+// const storage = multer.memoryStorage
+
+// 이미지 하드에 저장하기
+// public폴더 안에 image폴더를 만들어 이곳에 저장합니다.
+const storage = multer.diskStorage({
+  // 이미지 저장 경로 설정: ./public/image
+  destination: (request, file, callback) => {
+    callback(null, "./public/image");
+  },
+  // 파일명 설정: 원본 파일명으로
+  filename: (request, file, callback) => {
+    callback(null, file.originalname);
+    // 날짜 넣고싶으면
+    // callback(null, file.originalname + "날짜" + new Date());
+  },
+  // 이미지 확장자 제한
+  fileFilter: function (request, file, callback) {
+    var extension = path.extname(file.originalname);
+    if (extension !== ".png" && extension !== ".jpg" && extension !== ".jpeg") {
+      return callback(new Error("PNG, JPG, JPEG 만 업로드 됨"));
+    }
+    callback(null, true);
+  },
+  // 이미지 사이즈 제한 1024*1024는 1MB
+  // limits: {
+  //   fileSize: 1024 * 1024,
+  // },
+});
+
+const upload = multer({ storage: storage });
+
+// 이미지는 일반하드에 저장하는 것이 싸고 편하기 때문에 DB에 저장은 하지 않는 편
+app.get("/upload", (요청, 응답) => {
+  응답.render("upload.ejs");
+});
+
+// 파일은 하나 업로드
+// app.post("/upload", upload.single("input의 name 속성이름"), (요청, 응답) => {
+app.post("/upload", upload.single("profile"), (요청, 응답) => {
+  응답.send("업로드 성공");
+});
+
+// 파일을 여러개 업로드하려면 single이 아니라 array, input태그에 multiple
+// app.post("/upload", upload.array("profile", 10), (요청, 응답) => {
+//   응답.send("업로드 성공");
+// });
+
+// 업로드한 이미지 보여주기는 파라미터 문법을 써서
+app.get("/image/:imageName", (요청, 응답) => {
+  // __dirname은 현재 server.js 파일이 있는 경로
+  응답.sendFile(__dirname + "/public/image/" + 요청.params.imageName);
+});
+
+// MulterError: Unexpected field 에러가 발생한 원인은
+// input의 name property와 upload.single("") 의 값이 다를 경우
+// 그런데 한글 썼더니 오류납니다. 영어 씁시다.

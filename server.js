@@ -216,3 +216,54 @@ app.delete("/delete", (요청, 응답) => {
     응답.status(200).send({ message: "성공했습니다." });
   });
 });
+
+app.use("/shop", require("./routes/shop.js"));
+app.use("/board/sub", require("./routes/board.js"));
+
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: (request, file, callback) => {
+    callback(null, "./public/image");
+  },
+  filename: (request, file, callback) => {
+    callback(null, file.originalname);
+  },
+  fileFilter: function (request, file, callback) {
+    var extension = path.extname(file.originalname);
+    if (extension !== ".png" && extension !== ".jpg" && extension !== ".jpeg") {
+      return callback(new Error("PNG, JPG, JPEG 만 업로드 됨"));
+    }
+    callback(null, true);
+  },
+  limits: {
+    fileSize: 1024 * 1024,
+  },
+});
+
+const upload = multer({ storage: storage });
+
+app.get("/upload", (요청, 응답) => {
+  응답.render("upload.ejs");
+});
+
+// 파일은 하나 업로드
+// app.post("/upload", upload.single("input의 name 속성이름"), (요청, 응답) => {
+app.post("/upload", upload.single("profile"), (요청, 응답) => {
+  응답.send("업로드 성공");
+});
+
+// 파일을 여러개 업로드하려면 single이 아니라 array, input태그에 multiple
+// app.post("/upload", upload.array("profile", 10), (요청, 응답) => {
+//   응답.send("업로드 성공");
+// });
+
+// 업로드한 이미지 보여주기는 파라미터 문법을 써서
+app.get("/image/:imageName", (요청, 응답) => {
+  // __dirname은 현재 server.js 파일이 있는 경로
+  응답.sendFile(__dirname + "/public/image/" + 요청.params.imageName);
+});
+
+// MulterError: Unexpected field 에러가 발생한 원인은
+// input의 name property와 upload.single("") 의 값이 다를 경우
+// 그런데 한글 썼더니 오류납니다. 영어 씁시다.
